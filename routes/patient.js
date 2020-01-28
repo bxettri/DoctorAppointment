@@ -48,17 +48,17 @@ router.post('/login', (req, res, next) => {
                     }).catch(next);
             }
         }).catch(next);
-})
+});
 
-router.get('/me', auth.verifyUser, (req, res, next) => {
+router.get('/me', auth.verifyPatient, (req, res, next) => {
     res.json({ _id: req.user._id, firstName: req.user.firstName, lastName: req.user.lastName, username: req.user.username, image: req.user.image });
 });
 
-// router.put('/me', auth.verifyUser, (req, res, next) => {
-//     User.findByIdAndUpdate(req.patient._id, { $set: req.body }, { new: true })
-//         .then((patient) => {
-//             res.json({ _id: patient._id, firstName: req.user.firstName, lastName: req.user.lastName, username: user.username, image: user.image });
-//         }).catch(next);
-// });
+router.put('/me', auth.verifyPatient, (req, res, next) => {
+    User.findByIdAndUpdate(req.patient._id, { $set: req.body }, { new: true })
+        .then((patient) => {
+            res.json({ _id: patient._id, firstName: req.user.firstName, lastName: req.user.lastName, username: user.username, image: user.image });
+        }).catch(next);
+});
 
 module.exports = router;
