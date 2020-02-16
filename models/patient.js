@@ -3,13 +3,13 @@ const mongoose = require ('mongoose');
 const patientSchema = new mongoose.Schema({
    
     firstName:{
-        type:String,
+        type:String
      
     },
 
    
     lastName:{
-        type:String,
+        type:String
         
     },
 
@@ -21,28 +21,35 @@ const patientSchema = new mongoose.Schema({
 
     password:{
         type: String,
-        required:true,
+        required:true
         
     },
 
     email:{
 
-        type:String,
-        required:true,
+        type:String
         
     },
 
     dob:{
-        type:Date,
+        type:Date
         
     },
 
     address:{
-        type:String,
+        type:String
+       
+    },
+    phoneNumber:{
+        type:String
        
     },
 
-    doctor: {
+    profileImage:{
+        type: String
+    },
+    
+    admin: {
         type: Boolean,
         default: false
     }

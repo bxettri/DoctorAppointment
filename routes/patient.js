@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Patient = require('../models/patient');
 const router = express.Router();
+const Doctor = require('../models/doctor');
 const auth = require('../auth');
 
 
@@ -13,14 +14,14 @@ router.post('/signup', (req, res, next) => {
             throw new Error('Could not hash!');
         }
         Patient.create({
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
+            firstName: req.body.firstname,
+            lastName: req.body.lastname,
             username: req.body.username,
             address: req.body.address,
             email: req.body.email,
             dob:req.body.dob,
             password: hash,
-            image: req.body.image
+            profileImage: req.body.profileImage
         }).then((patient) => {
             let token = jwt.sign({ _id: patient._id }, process.env.SECRET);
             res.json({ status: "Signup success!", token: token });
@@ -51,14 +52,70 @@ router.post('/login', (req, res, next) => {
 });
 
 router.get('/me', auth.verifyPatient, (req, res, next) => {
-    res.json({ _id: req.user._id, firstName: req.user.firstName, lastName: req.user.lastName, username: req.user.username, image: req.user.image });
+    res.json({ _id: req.patient._id, firstName: req.patient.firstName, lastName: req.patient.lastName, email: req.patient.email, profileImage: req.patient.profileImage });
 });
 
-router.put('/me', auth.verifyPatient, (req, res, next) => {
+router.put('/updateProfile', auth.verifyPatient, (req, res, next) => {
     User.findByIdAndUpdate(req.patient._id, { $set: req.body }, { new: true })
         .then((patient) => {
             res.json({ _id: patient._id, firstName: req.user.firstName, lastName: req.user.lastName, username: user.username, image: user.image });
         }).catch(next);
 });
 
+router.post('/verifyPass', auth.verifyPatient,(req,res,next)=>{
+    User.findById(req.patient._id)
+    .then((patient)=>{
+
+        bcrypt.compare(req.body.password, patient.password)
+            .then((isMatch)=>{
+                if(!isMatch){
+                    let err = new Error('password did not match!');
+                    err.status =401;
+                    return next(err);
+                }
+                res.json({status: 'ok', password: req.patient.password});
+            }).catch(next);
+    }).catch(next);
+});
+
+router.put('/updatePass', auth.verifyPatient, (req, res, next) => {
+        let password = req.body.password;
+        bcrypt.hash(password, 10, function (err, hash){
+            if(err){
+                throw new Error('Could not hash!');
+            }
+            else{
+                password = hash;
+            }
+
+        User.findByIdAndUpdate(req.patient._id, {$set:{password:password}}, {new: true})
+        .then((patient)=>{
+            res.json({status: 'ok', password: req.patient.password});
+        }).catch(next);
+    });
+});
+
+router.get('/AllDoctor', auth.verifyPatient,(req,res,next)=>{
+    Doctor.find({})
+        .then((doctor)=>{
+            res.json(doctor);
+        }).catch(next);
+})
+
+router.get('/getdoctorybycategory', auth.verifyPatient,(req,res,next)=>{
+    // console.log(req.query.categoryId)
+
+    require("../models/speciality").findOne({categoryName:req.query.categoryName})
+    .exec().then((specialization)=>{
+        // Doctor.find({categoryName:req.query.categoryId})
+        Doctor.find({categoryName:specialization._id})
+        .then((doctor)=>{
+            res.json(doctor);
+        }).catch(next);
+    }).catch(next)
+
+    // require("../models/speciality").findOne({categoryName:req.body.categoryName})
+    // .exec().then((specialization)=>{
+    // })
+})
 module.exports = router;
