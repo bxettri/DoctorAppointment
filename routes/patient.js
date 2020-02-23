@@ -19,6 +19,7 @@ router.post('/signup', (req, res, next) => {
             username: req.body.username,
             address: req.body.address,
             email: req.body.email,
+            phoneNumber: req.body.phoneNumber,
             dob:req.body.dob,
             password: hash,
             profileImage: req.body.profileImage
@@ -52,13 +53,18 @@ router.post('/login', (req, res, next) => {
 });
 
 router.get('/me', auth.verifyPatient, (req, res, next) => {
-    res.json({ _id: req.patient._id, firstName: req.patient.firstName, lastName: req.patient.lastName, email: req.patient.email, profileImage: req.patient.profileImage });
+    res.json({ _id: req.patient._id, firstName: req.patient.firstName, lastName: req.patient.lastName, email: req.patient.email,
+         address:req.patient.address, username:req.patient.username, profileImage: req.patient.profileImage 
+        ,phoneNumber:req.patient.phoneNumber//extra used in React
+        });
 });
 
 router.put('/updateProfile', auth.verifyPatient, (req, res, next) => {
-    User.findByIdAndUpdate(req.patient._id, { $set: req.body }, { new: true })
+    Patient.findByIdAndUpdate( req.patient._id,{ $set: req.body }, { new: true })
         .then((patient) => {
-            res.json({ _id: patient._id, firstName: req.user.firstName, lastName: req.user.lastName, username: user.username, image: user.image });
+           // res.json({ firstName: req.patient.firstName, lastName: req.patient.lastName, username: req.patient.username,  email: req.patient.email, address:req.patient.address, profileImage: patient.profileImage });
+            
+         res.json(req.body);   
         }).catch(next);
 });
 

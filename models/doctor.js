@@ -69,7 +69,6 @@ const doctorSchema = new mongoose.Schema({
         default: false
     },
         
-
     categoryName: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Speciality'

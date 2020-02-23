@@ -22,12 +22,35 @@ router.post('/appointDoctor', (req, res, next) => {
         .catch(next);
 });
 
+
 router.get('/getAppointment', (req, res, next) =>{
     Appointment.findById({DoctorId: req.doctor._id})
     .then((appointment)=>{
         res.json(appointment);
     })
 });
+
+
+
+router.route('/myAppointment')
+.get((req, res, next)=> {
+    Appointment.find({BookedBy:req.patient.id})
+    .then((appointment)=>{
+        res.json(appointment);
+    }).catch((err)=>next (err))
+});
+
+router.route('/myAppointmentReact')
+.get((req, res, next)=> {
+    Appointment.find({BookedBy:req.patient.id})
+    .populate({
+        path:'DoctorId'
+    })
+    .then((appointment)=>{
+        res.json(appointment);
+    }).catch((err)=>next (err))
+});
+
 // router.get('/getDocAPpointmnet', (req, res, next) =>{
 //     Appointment.findById({DoctorId: req.doctor._id})
 //     .then((appointment)=>{
@@ -35,11 +58,15 @@ router.get('/getAppointment', (req, res, next) =>{
 //     })
 // });
 
-router.delete('/deleteAppointment', (req, res, next)=> {
-    Appointment.findOneAndDelete({appointmentId:req.body.appointmentId})
-    .then((appointment)=>{
-        res.json({status:"deleted"});
-    })
+router.delete('/:id/deleteAppointment', (req, res, next)=> {
+    Patient.findById(req.patient._id)
+        .then((patient)=>{
+            Appointment.findOneAndDelete({id:req.body._id})
+                .then((appointment)=>{
+                    res.json({status:"deleted"});
+                }).catch(next);
+        }).catch(next);
 }); 
+
 
 module.exports = router;

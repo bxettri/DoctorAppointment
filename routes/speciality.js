@@ -7,7 +7,8 @@ const router = express.Router();
 
 router.route('/')
 .get((req, res, next)=>{
-    Speciality.find({}).populate({path:'Doctor'})
+    Speciality.find({})
+    .populate({path:'Doctor'})
         .then((speciality)=>{
             res.json(speciality);
         })
