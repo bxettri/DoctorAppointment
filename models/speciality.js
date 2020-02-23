@@ -3,7 +3,7 @@ const specialitySchema= new mongoose.Schema({
     categoryName:{
         type: String,
         
-        unique:true
+      //  unique:true
     },
     categoryImage:{
         type: String
